@@ -13,7 +13,9 @@ int main() {
 
     for(YAML::const_iterator it=config.begin();it!=config.end();++it) {
         if (it->first.as<std::string>() == "body") {
-            Body b(it->second["pos"][0].as<double>(),it->second["pos"][1].as<double>(),it->second["pos"][2].as<double>(),it->second["mass"].as<double>());
+            std::vector<double> pos = it->second["pos"].as<std::vector<double>>();
+            std::vector<double> vel = it->second["vel"].as<std::vector<double>>();
+            Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass"].as<double>());
             sim.addBody(b);
         }
     }    

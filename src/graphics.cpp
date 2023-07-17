@@ -27,7 +27,7 @@ Graphics::Graphics(int width, int height) {
     glfwSwapBuffers(window);
 }
 
-void Graphics::renderPoints(std::vector<double> pts) {
+void Graphics::renderPoints(std::vector<double>& pts) {
     glBufferData(GL_ARRAY_BUFFER, pts.size()*sizeof(double), pts.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, sizeof(double)*3, nullptr);
     glEnableVertexAttribArray(0);

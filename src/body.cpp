@@ -1,9 +1,9 @@
 #include "body.hpp"
 
-Body::Body(double x, double y, double z, double m) {
-    position = {x,y,z};
+Body::Body(Eigen::Vector3d pos, Eigen::Vector3d vel, double m) {
+    position = pos;
+    velocity = vel;
     mass = m;
-    velocity = {0,0,0};
 }
 
 

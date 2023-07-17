@@ -3,7 +3,7 @@
 
 class Body {
 public:
-    Body(double x, double y, double z, double m);
+    Body(Eigen::Vector3d pos, Eigen::Vector3d vel, double m);
     double mass;
     Eigen::Vector3d velocity;
     Eigen::Vector3d position;

@@ -8,7 +8,7 @@
 class Graphics {
 public:
     Graphics(int width, int height);
-    void renderPoints(std::vector<double> pts);
+    void renderPoints(std::vector<double>& pts);
     GLFWwindow* window;
 private:
     GLuint createShaderProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
