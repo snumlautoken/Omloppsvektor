@@ -2,10 +2,10 @@ win_size: [1000,1000]
 
 body:
   pos: [0.5,0.1,0.2]
-  mass: 1000
+  mass: 10000
 body:
   pos: [0,-1,-0.4]
-  mass: 100
+  mass: 10000
 body:
   pos: [0,0,0]
   mass: 10000

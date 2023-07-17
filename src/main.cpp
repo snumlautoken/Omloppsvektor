@@ -18,7 +18,7 @@ int main() {
         }
     }    
 
-    while(true) {
+    while(!glfwWindowShouldClose(graphics.window)) {
         sim.step();
         std::vector<double> vertices;
         for (Body b : sim.bodies) {
@@ -27,6 +27,7 @@ int main() {
             vertices.push_back(b.position[2]);
         }
         graphics.renderPoints(vertices);
+        glfwPollEvents();
     }
     return 0;
 }

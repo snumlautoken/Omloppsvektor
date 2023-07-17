@@ -17,7 +17,7 @@ Graphics::Graphics(int width, int height) {
 	glewExperimental = GL_TRUE;
 
 	glewInit();
-    shaderProgram = createShaderProgram("/home/snok/Documents/Omloppsvektor/shaders/vertex.vert", "/home/snok/Documents/Omloppsvektor/shaders/fragment.frag");
+    shaderProgram = createShaderProgram("shaders/vertex.vert", "shaders/fragment.frag");
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
