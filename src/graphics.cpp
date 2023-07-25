@@ -7,16 +7,16 @@
 Graphics::Graphics(int width, int height) {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-
-	window = glfwCreateWindow(width, height, "Omloppsvektor", nullptr, nullptr);
-	glfwMakeContextCurrent(window);
-	glewExperimental = GL_TRUE;
-
-	glewInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+    
+    window = glfwCreateWindow(width, height, "Omloppsvektor", nullptr, nullptr);
+    glfwMakeContextCurrent(window);
+    glewExperimental = GL_TRUE;
+    
+    glewInit();
     shaderProgram = createShaderProgram("shaders/vertex.vert", "shaders/fragment.frag");
 
     glGenVertexArrays(1, &vao);
@@ -31,6 +31,7 @@ void Graphics::renderPoints(std::vector<double>& pts) {
     glBufferData(GL_ARRAY_BUFFER, pts.size()*sizeof(double), pts.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, sizeof(double)*3, nullptr);
     glEnableVertexAttribArray(0);
+    glEnable(GL_PROGRAM_POINT_SIZE);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
