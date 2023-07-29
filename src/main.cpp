@@ -22,11 +22,9 @@ int main() {
 
     while(!glfwWindowShouldClose(graphics.window)) {
         sim.step();
-        std::vector<double> vertices;
+        std::vector<glm::vec3> vertices;
         for (Body b : sim.bodies) {
-            vertices.push_back(b.position[0]);
-            vertices.push_back(b.position[1]);
-            vertices.push_back(b.position[2]);
+            vertices.push_back(glm::vec3(b.position[0], b.position[1], b.position[2]));
         }
         graphics.renderPoints(vertices);
         glfwPollEvents();
