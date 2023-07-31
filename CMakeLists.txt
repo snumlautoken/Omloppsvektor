@@ -12,4 +12,4 @@ find_package(glm REQUIRED)
 
 set(CMAKE_BUILD_TYPE Debug)
 add_executable (Omloppsvektor src/main.cpp src/body.cpp src/graphics.cpp src/simulation.cpp)
-target_link_libraries(Omloppsvektor glfw OpenGL GLEW yaml-cpp Eigen3::Eigen glm)
+target_link_libraries(Omloppsvektor glfw OpenGL GLEW yaml-cpp Eigen3::Eigen)
