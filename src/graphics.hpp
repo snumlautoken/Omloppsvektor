@@ -7,16 +7,19 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <vector>
+#include "body.hpp"
 
 const float gr = (1+sqrt(5))/4;
 
 class Graphics {
 public:
     Graphics(int width, int height);
-    void renderPoints(std::vector<glm::vec3>& pts);
+    void renderPoints(std::vector<Body>& bodies);
     GLFWwindow* window;
 private:
     GLuint createShaderProgram(const std::string& vertexrShaderPath, const std::string& fragmentShaderPath);
+    glm::fvec3 getColor(uint32_t color);
+
     GLuint shaderProgram;
     GLuint vao;
     GLuint vbo;

@@ -45,12 +45,12 @@ Graphics::Graphics(int width, int height) {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
 }
 
-void Graphics::renderPoints(std::vector<glm::vec3>& pts) {
-
+void Graphics::renderPoints(std::vector<Body>& bodies) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    for (auto pt : pts) {
+    for (Body body : bodies) {
         glm::mat4 model = glm::mat4(1.0f);
+        auto pt = body.position;
         model = glm::translate(model, glm::vec3(40*pt[0],40*pt[1],-40+pt[2]*40));
         model = glm::rotate(model, (float)glfwGetTime()*glm::radians(20.0f), glm::vec3(1.0f, 0.3f, 0.5f));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
@@ -58,7 +58,8 @@ void Graphics::renderPoints(std::vector<glm::vec3>& pts) {
         glBindVertexArray(vao);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glUniform3f(glGetUniformLocation(shaderProgram, "inColor"), 1.0, 0.0, 1.0);
+        auto color = getColor(body.color);
+        glUniform3fv(glGetUniformLocation(shaderProgram, "inColor"), 1, &color[0]);
         glDrawElements(GL_TRIANGLES,60,GL_UNSIGNED_INT,0);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0, 1.0);
@@ -68,6 +69,14 @@ void Graphics::renderPoints(std::vector<glm::vec3>& pts) {
         glBindVertexArray(0);
     }
     glfwSwapBuffers(window);
+}
+
+glm::fvec3 Graphics::getColor(uint32_t color) {
+    float r,g,b;
+    r = ((color>>16)&0xFF)/255.0;
+    g = ((color>>8)&0xFF)/255.0;
+    b = ((color)&0xFF)/255.0;
+    return glm::fvec3(r,g,b);
 }
 
 GLuint Graphics::createShaderProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {

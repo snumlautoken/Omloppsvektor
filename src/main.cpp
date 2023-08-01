@@ -15,18 +15,15 @@ int main() {
         if (it->first.as<std::string>() == "body") {
             std::vector<double> pos = it->second["pos"].as<std::vector<double>>();
             std::vector<double> vel = it->second["vel"].as<std::vector<double>>();
-            Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass"].as<double>());
+            uint32_t color = it->second["color"].as<uint>();
+            Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass"].as<double>(), color);
             sim.addBody(b);
         }
     }    
 
     while(!glfwWindowShouldClose(graphics.window)) {
         sim.step();
-        std::vector<glm::vec3> vertices;
-        for (Body b : sim.bodies) {
-            vertices.push_back(glm::vec3(b.position[0], b.position[1], b.position[2]));
-        }
-        graphics.renderPoints(vertices);
+        graphics.renderPoints(sim.bodies);
         glfwPollEvents();
     }
     return 0;

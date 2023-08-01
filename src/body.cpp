@@ -1,9 +1,10 @@
 #include "body.hpp"
 
-Body::Body(Eigen::Vector3d pos, Eigen::Vector3d vel, double m) {
+Body::Body(Eigen::Vector3d pos, Eigen::Vector3d vel, double m, uint32_t c) {
     position = pos;
     velocity = vel;
     mass = m;
+    color = c;
 }
 
 
