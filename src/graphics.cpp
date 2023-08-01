@@ -10,6 +10,7 @@ Graphics::Graphics(int width, int height) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     window = glfwCreateWindow(width, height, "Omloppsvektor", nullptr, nullptr);
     glfwMakeContextCurrent(window);
@@ -19,16 +20,20 @@ Graphics::Graphics(int width, int height) {
     );
     glewInit();
     shaderProgram = createShaderProgram("shaders/vertex.vert", "shaders/fragment.frag");
+    glEnable(GL_MULTISAMPLE);  
 
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
     glfwSwapBuffers(window);
     glUseProgram(shaderProgram);
     glEnable(GL_DEPTH_TEST);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
     glEnableVertexAttribArray(0);
     glEnable(GL_PROGRAM_POINT_SIZE);
@@ -51,7 +56,16 @@ void Graphics::renderPoints(std::vector<glm::vec3>& pts) {
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
 
         glBindVertexArray(vao);
-        glDrawArrays(GL_LINE_STRIP_ADJACENCY, 0, 36);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glUniform3f(glGetUniformLocation(shaderProgram, "inColor"), 1.0, 0.0, 1.0);
+        glDrawElements(GL_TRIANGLES,60,GL_UNSIGNED_INT,0);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(1.0, 1.0);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glUniform3f(glGetUniformLocation(shaderProgram, "inColor"), 0.0, 0.0, 0.0);
+        glDrawElements(GL_TRIANGLES,60,GL_UNSIGNED_INT,0);
+        glBindVertexArray(0);
     }
     glfwSwapBuffers(window);
 }
