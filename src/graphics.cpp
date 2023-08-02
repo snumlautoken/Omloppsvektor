@@ -13,12 +13,18 @@ Graphics::Graphics(int width, int height) {
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     window = glfwCreateWindow(width, height, "Omloppsvektor", nullptr, nullptr);
-    glfwMakeContextCurrent(window);
     glewExperimental = GL_TRUE;
+
+    glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);  
     glfwSetFramebufferSizeCallback(window, 
         [](GLFWwindow* window, int width, int height) {glViewport(0, 0, width, height);}
     );
+
     glewInit();
+
+    input = std::make_unique<Input>(window);
+
     shaderProgram = createShaderProgram("shaders/vertex.vert", "shaders/fragment.frag");
     glEnable(GL_MULTISAMPLE);  
 
@@ -37,17 +43,18 @@ Graphics::Graphics(int width, int height) {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
     glEnableVertexAttribArray(0);
     glEnable(GL_PROGRAM_POINT_SIZE);
-    glm::mat4 view          = glm::mat4(1.0f);
     glm::mat4 projection    = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)1000 / (float)1000, 0.1f, 100.0f);
-    view       = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
 }
 
 void Graphics::renderPoints(std::vector<Body>& bodies) {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    input->pollEvents();
+    glm::mat4 view;
+    view = input->getView();
+    glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
     for (Body body : bodies) {
         glm::mat4 model = glm::mat4(1.0f);
         auto pt = body.position;

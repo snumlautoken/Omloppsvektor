@@ -7,7 +7,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <string>
 #include <vector>
+#include <memory>
 #include "body.hpp"
+#include "input.hpp"
 
 const float gr = (1+sqrt(5))/4;
 
@@ -19,7 +21,6 @@ public:
 private:
     GLuint createShaderProgram(const std::string& vertexrShaderPath, const std::string& fragmentShaderPath);
     glm::fvec3 getColor(uint32_t color);
-
     GLuint shaderProgram;
     GLuint vao;
     GLuint vbo;
@@ -35,4 +36,5 @@ private:
         7,10,3, 7,6,10, 7,11,6, 11,0,6, 0,1,6, 
         6,1,10, 9,0,11, 9,11,2, 9,2,5, 7,2,11 
     };
+    std::unique_ptr<Input> input;
 };
