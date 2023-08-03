@@ -15,3 +15,5 @@ body:
   vel: [-0.00277667724561,0,0]
   mass: 100
   color: 0x00FFFF
+
+random: 50
