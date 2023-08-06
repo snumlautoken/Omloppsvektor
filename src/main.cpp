@@ -9,7 +9,7 @@ int main() {
 
 
     Graphics graphics(config["win_size"][0].as<int>(),config["win_size"][1].as<int>());
-    Simulation sim(1);
+    Simulation sim(config["sim_time_per_sec"].as<double>());
 
     for(YAML::const_iterator it=config.begin();it!=config.end();++it) {
         if (it->first.as<std::string>() == "body") {

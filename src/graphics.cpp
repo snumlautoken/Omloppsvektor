@@ -25,7 +25,7 @@ Graphics::Graphics(int width, int height) {
 
     input = std::make_unique<Input>(window);
 
-    shaderProgram = createShaderProgram("shaders/vertex.vert", "shaders/fragment.frag");
+    shaderProgram = createShaderProgram("shaders/vertex.vs", "shaders/fragment.fs");
     glEnable(GL_MULTISAMPLE);  
 
     glGenVertexArrays(1, &vao);

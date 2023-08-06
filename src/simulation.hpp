@@ -1,4 +1,5 @@
 #include <vector>
+#include <chrono>
 #include "body.hpp"
 
 const double G = 6.674e-11;
@@ -10,5 +11,6 @@ public:
     void step();
     std::vector<Body> bodies;
 private:
-    double dt;
+    double stepSize;
+    std::chrono::time_point<std::chrono::steady_clock> prevTime;
 };
