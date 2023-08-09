@@ -3,6 +3,13 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+#include <filesystem>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
+void printError() {
+    std::cout << glGetError() << std::endl;
+}
 
 Graphics::Graphics(int width, int height) {
     glfwInit();
@@ -26,35 +33,56 @@ Graphics::Graphics(int width, int height) {
     input = std::make_unique<Input>(window);
 
     shaderProgram = createShaderProgram("shaders/vertex.vs", "shaders/fragment.fs");
+    skyboxProgram = createShaderProgram("shaders/skybox.vs", "shaders/skybox.fs");
     glEnable(GL_MULTISAMPLE);  
 
+    // Objects
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
+    glEnableVertexAttribArray(0);
+
+    // Skybox
+    glGenVertexArrays(1, &skyboxvao);
+    glGenBuffers(1, &skyboxvbo);
+    glBindVertexArray(skyboxvao);
+    glBindBuffer(GL_ARRAY_BUFFER, skyboxvbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), skyboxVertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
+    glEnableVertexAttribArray(0);
+
     glfwSwapBuffers(window);
     glUseProgram(shaderProgram);
     glEnable(GL_DEPTH_TEST);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
-    glEnableVertexAttribArray(0);
     glEnable(GL_PROGRAM_POINT_SIZE);
+
     glm::mat4 projection    = glm::mat4(1.0f);
     projection = glm::perspective(glm::radians(45.0f), (float)1000 / (float)1000, 0.1f, 100.0f);
+
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
+    
+    glUseProgram(skyboxProgram);
+    glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
+    skyboxtex = loadCubemap("resources/starbox");
+    glUniform1i(glGetUniformLocation(skyboxProgram, "skybox"), 0);
 }
+    
 
 void Graphics::renderPoints(std::vector<Body>& bodies) {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     input->pollEvents();
     glm::mat4 view;
     view = input->getView();
+    glUseProgram(shaderProgram);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
+
     for (Body body : bodies) {
         glm::mat4 model = glm::mat4(1.0f);
         auto pt = body.position;
@@ -75,6 +103,18 @@ void Graphics::renderPoints(std::vector<Body>& bodies) {
         glDrawElements(GL_TRIANGLES,60,GL_UNSIGNED_INT,0);
         glBindVertexArray(0);
     }
+
+    view = glm::mat4(glm::mat3(view));
+    glUseProgram(skyboxProgram);
+    glUniformMatrix4fv(glGetUniformLocation(skyboxProgram, "view"), 1, GL_FALSE, &view[0][0]);
+    glDepthFunc(GL_LEQUAL);
+    glBindVertexArray(skyboxvao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxtex);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthFunc(GL_LESS);
+
     glfwSwapBuffers(window);
 }
 
@@ -84,6 +124,40 @@ glm::fvec3 Graphics::getColor(uint32_t color) {
     g = ((color>>8)&0xFF)/255.0;
     b = ((color)&0xFF)/255.0;
     return glm::fvec3(r,g,b);
+}
+
+GLuint Graphics::loadCubemap(std::string dir) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+    int width, height, nrChannels;
+    
+    u_char* data = stbi_load((dir + "/right.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    data = stbi_load((dir + "/left.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    data = stbi_load((dir + "/top.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    data = stbi_load((dir + "/bottom.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    data = stbi_load((dir + "/front.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    data = stbi_load((dir + "/back.png").c_str(), &width, &height, &nrChannels, 0);
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }
 
 GLuint Graphics::createShaderProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
