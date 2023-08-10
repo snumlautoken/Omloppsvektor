@@ -28,6 +28,7 @@ void Input::processKb(double dT) {
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)       { movePos += up; };
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)  { movePos -= up; };
 
+    movePos = glm::length(movePos) > 1.0 ? glm::normalize(movePos) : movePos;
     pos += movePos * speed;
 }
 
