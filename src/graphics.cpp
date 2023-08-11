@@ -43,11 +43,16 @@ Graphics::Graphics(int width, int height) {
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     generateSphere(0.5, 18, 18);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
+    size_t vertexSize = vertices.size()*sizeof(float);
+    glBufferData(GL_ARRAY_BUFFER, vertexSize*2, nullptr, GL_STATIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, vertexSize, vertices.data());
+    glBufferSubData(GL_ARRAY_BUFFER, vertexSize, normals.size()*sizeof(float), normals.data());
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(float), indices.data(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, nullptr);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)(vertexSize));
     glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
 
     // Skybox
     glGenVertexArrays(1, &skyboxvao);
@@ -55,7 +60,7 @@ Graphics::Graphics(int width, int height) {
     glGenBuffers(1, &skyboxebo);
     glBindVertexArray(skyboxvao);
     glBindBuffer(GL_ARRAY_BUFFER, skyboxvbo);
-    generateCube(2.0);
+    generateCube(1.0);
     glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(float), vertices.data(), GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skyboxebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(float), indices.data(), GL_STATIC_DRAW);
@@ -86,18 +91,19 @@ void Graphics::renderPoints(std::vector<Body>& bodies) {
     view = input->getView();
     glUseProgram(shaderProgram);
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, &view[0][0]);
-
     for (Body body : bodies) {
         glm::mat4 model = glm::mat4(1.0f);
         auto pt = body.position;
         model = glm::translate(model, glm::vec3(40*pt[0],40*pt[1],-40+pt[2]*40));
-        model = glm::rotate(model, (float)glfwGetTime()*glm::radians(20.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, (float)glfwGetTime()*glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
-
+        glm::mat3 invModel = glm::mat3(glm::transpose(glm::inverse(model)));
+        glUniformMatrix3fv(glGetUniformLocation(shaderProgram, "invModel"), 1, GL_FALSE, &invModel[0][0]);
         glBindVertexArray(vao);
         glDisable(GL_POLYGON_OFFSET_FILL);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         auto color = getColor(body.color);
+        glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), 0.0, 0.0, -40.0);
         glUniform3fv(glGetUniformLocation(shaderProgram, "inColor"), 1, &color[0]);
         glDrawElements(GL_TRIANGLES,18*18*2*3,GL_UNSIGNED_INT,0);
         glEnable(GL_POLYGON_OFFSET_FILL);
@@ -177,13 +183,16 @@ void Graphics::generateCube(float sideLen) {
 
 void Graphics::generateSphere(float r, uint stacks, uint sectors) {
     vertices.clear();
+    normals.clear();
     for (int i = 0; i < sectors; i++) {
+        float theta = 2*M_PI*i/sectors;
         for (int j = 0; j <= stacks; j++) {
-            float theta = 2*M_PI*i/sectors;
             float phi = M_PI_2-M_PI*j/stacks;
-            vertices.push_back(r*cos(phi)*cos(theta)); // x
-            vertices.push_back(r*sin(phi)); // y
-            vertices.push_back(r*cos(phi)*sin(theta)); // z
+            float x = r*cos(phi)*cos(theta);
+            float y = r*sin(phi);
+            float z = r*cos(phi)*sin(theta);
+            vertices.insert(vertices.end(), {x,y,z});
+            normals.insert(normals.end(), {x/r,y/r,z/r});
         }
     }
 

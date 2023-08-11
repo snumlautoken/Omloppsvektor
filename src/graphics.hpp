@@ -19,7 +19,7 @@ public:
     void renderPoints(std::vector<Body>& bodies);
     GLFWwindow* window;
 private:
-    GLuint createShaderProgram(const std::string& vertexrShaderPath, const std::string& fragmentShaderPath);
+    GLuint createShaderProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     glm::fvec3 getColor(uint32_t color);
     GLuint loadCubemap(std::string file);
 
@@ -37,6 +37,7 @@ private:
     GLuint skyboxtex;
 
     std::vector<float> vertices;
+    std::vector<float> normals;
     std::vector<GLuint> indices;
     
     std::unique_ptr<Input> input;
