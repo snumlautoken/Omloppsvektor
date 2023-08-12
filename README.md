@@ -18,7 +18,7 @@ After installing the required dependencies simply run `cmake .` followed by `mak
 
 ## Running
 
-The simulation environment is determined by yaml-configurations and an example of one can be found in [rocky.yaml](resources/rocky.yaml), which should be self-explanatory with units in AU, earth-masses and km/s.
+The simulation environment is determined by yaml-configurations and an example of one can be found in [resources/rocky.yaml](https://github.com/snumlautoken/Omloppsvektor/blob/main/examples/rocky.yaml), which should be self-explanatory with units in AU, earth-masses and km/s.
 
 To run the example simply run:
 ```
