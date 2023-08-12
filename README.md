@@ -10,7 +10,7 @@ The required dependencies are:
 - `glfw3`
 - `GLEW`
 - `Eigen3`
-- `yamn-cpp`
+- `yaml-cpp`
 - `glm`
 - `stb`
 
