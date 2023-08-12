@@ -23,12 +23,6 @@ int main(int argc, char *argv[]) {
             Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass_earths"].as<double>(), it->second["gl_rad"].as<float>(), color);
             sim.addBody(b);
         }
-
-        for (int i = 0; i < config["random"].as<uint>(); i++) {
-            Body b(Eigen::Vector3d(double(std::rand())*2/RAND_MAX-1,double(std::rand())*2/RAND_MAX-1,double(std::rand())*2/RAND_MAX-1),Eigen::Vector3d((double(std::rand())*2/RAND_MAX-1)/20,0,0), 1000, (double(std::rand())*2/RAND_MAX-1)*0xFFFFFF);
-            sim.addBody(b);
-        }
-
     }    
 
     while(!glfwWindowShouldClose(graphics.window)) {
