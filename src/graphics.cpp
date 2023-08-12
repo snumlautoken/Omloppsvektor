@@ -42,7 +42,7 @@ Graphics::Graphics(int width, int height) {
     glGenBuffers(1, &ebo);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    generateSphere(0.5, 18, 18);
+    generateSphere(1.0, 16, 32);
     size_t vertexSize = vertices.size()*sizeof(float);
     glBufferData(GL_ARRAY_BUFFER, vertexSize*2, nullptr, GL_STATIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vertexSize, vertices.data());
@@ -72,8 +72,8 @@ Graphics::Graphics(int width, int height) {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    glm::mat4 projection    = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), (float)1000 / (float)1000, 0.1f, 100.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float)1000 / (float)1000, 0.1f, 1000.0f);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
     
@@ -94,8 +94,9 @@ void Graphics::renderPoints(std::vector<Body>& bodies) {
     for (Body body : bodies) {
         glm::mat4 model = glm::mat4(1.0f);
         auto pt = body.position;
-        model = glm::translate(model, glm::vec3(40*pt[0],40*pt[1],-40+pt[2]*40));
+        model = glm::translate(model, glm::vec3(pt[0],pt[1],pt[2]));
         model = glm::rotate(model, (float)glfwGetTime()*glm::radians(40.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(body.glRad,body.glRad,body.glRad));
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, &model[0][0]);
         glm::mat3 invModel = glm::mat3(glm::transpose(glm::inverse(model)));
         glUniformMatrix3fv(glGetUniformLocation(shaderProgram, "invModel"), 1, GL_FALSE, &invModel[0][0]);
@@ -105,12 +106,12 @@ void Graphics::renderPoints(std::vector<Body>& bodies) {
         auto color = getColor(body.color);
         glUniform3f(glGetUniformLocation(shaderProgram, "lightPos"), 0.0, 0.0, -40.0);
         glUniform3fv(glGetUniformLocation(shaderProgram, "inColor"), 1, &color[0]);
-        glDrawElements(GL_TRIANGLES,18*18*2*3,GL_UNSIGNED_INT,0);
+        glDrawElements(GL_TRIANGLES,16*32*2*3,GL_UNSIGNED_INT,0);
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0, 1.0);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glUniform3f(glGetUniformLocation(shaderProgram, "inColor"), 0.0, 0.0, 0.0);
-        glDrawElements(GL_TRIANGLES,18*18*2*3,GL_UNSIGNED_INT,0);
+        glDrawElements(GL_TRIANGLES,16*32*2*3,GL_UNSIGNED_INT,0);
         glBindVertexArray(0);
     }
 

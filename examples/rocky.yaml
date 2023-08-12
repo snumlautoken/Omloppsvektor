@@ -1,0 +1,45 @@
+win_size: [1000,1000]
+
+sim_time_per_sec: 2592000 # 30 days
+
+# sun
+body:
+  pos_au: [0,0,0]
+  vel_kms: [0,0,0]
+  mass_earths: 332950
+  color_hex: 0xfff900
+  gl_rad: 0.2
+
+# mercury
+body:
+  pos_au: [0,0,0.387]
+  vel_kms: [47.36,0,0]
+  mass_earths: 0.055
+  color_hex: 0xb1adad
+  gl_rad: 0.038
+
+# venus
+body:
+  pos_au: [0,0,0.723]
+  vel_kms: [35.02,0,0]
+  mass_earths: 0.9499
+  color_hex: 0xe3bb76
+  gl_rad: 0.095
+
+# earth
+body:
+  pos_au: [0,0,1.0]
+  vel_kms: [29.78,0,0]
+  mass_earths: 1.0
+  color_hex: 0x6b93d6
+  gl_rad: 0.1
+
+# mars
+body:
+  pos_au: [0,0,1.52]
+  vel_kms: [24.07,0,0]
+  mass_earths: 0.1
+  color_hex: 0xc1440e
+  gl_rad: 0.0533
+
+random: 0

@@ -4,19 +4,23 @@
 #include "simulation.hpp"
 #include "graphics.hpp"
 
-int main() {
-    YAML::Node config = YAML::LoadFile("examples/solarsystem.yaml");
-
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        std::cerr << "No file provided" << std::endl;
+        return 1;
+    }
+    
+    YAML::Node config = YAML::LoadFile(argv[1]);
 
     Graphics graphics(config["win_size"][0].as<int>(),config["win_size"][1].as<int>());
     Simulation sim(config["sim_time_per_sec"].as<double>());
 
     for(YAML::const_iterator it=config.begin();it!=config.end();++it) {
         if (it->first.as<std::string>() == "body") {
-            std::vector<double> pos = it->second["pos"].as<std::vector<double>>();
-            std::vector<double> vel = it->second["vel"].as<std::vector<double>>();
-            uint32_t color = it->second["color"].as<uint>();
-            Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass"].as<double>(), color);
+            std::vector<double> pos = it->second["pos_au"].as<std::vector<double>>();
+            std::vector<double> vel = it->second["vel_kms"].as<std::vector<double>>();
+            uint32_t color = it->second["color_hex"].as<uint>();
+            Body b(Eigen::Vector3d(pos[0],pos[1],pos[2]),Eigen::Vector3d(vel[0],vel[1],vel[2]), it->second["mass_earths"].as<double>(), it->second["gl_rad"].as<float>(), color);
             sim.addBody(b);
         }
 

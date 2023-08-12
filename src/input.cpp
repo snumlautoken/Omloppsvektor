@@ -18,7 +18,7 @@ void Input::pollEvents() {
 }
 
 void Input::processKb(double dT) {
-    float speed = 10.0 * dT;
+    float speed = 1.0 * dT;
     glm::vec3 movePos(0.0f);
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)           { movePos += dir; };

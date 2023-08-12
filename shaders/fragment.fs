@@ -9,5 +9,5 @@ uniform vec3 lightPos;
 
 void main() {
     float diff = max(dot(normalize(normal), normalize(lightPos-pos)), 0.0);
-    outColor = vec4((0.1+diff)*inColor, 1.0);
+    outColor = vec4(inColor, 1.0);
 }
