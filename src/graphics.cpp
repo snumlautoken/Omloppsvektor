@@ -73,7 +73,7 @@ Graphics::Graphics(int width, int height) {
     glEnable(GL_PROGRAM_POINT_SIZE);
 
     glm::mat4 projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), (float)1000 / (float)1000, 0.1f, 1000.0f);
+    projection = glm::perspective(glm::radians(60.0f), (float)1000 / (float)1000, 0.1f, 1000.0f);
 
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
     
